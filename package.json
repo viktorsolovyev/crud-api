@@ -3,9 +3,23 @@
   "version": "1.0.0",
   "description": "Simple CRUD API using in-memory database underneath.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "dev": "npx nodemon",
+    "lint": "npx eslint ./src",
+    "format": "npx eslint ./src --fix",
     "test": "test"
   },
   "author": "Viktor Solovyev",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "eslint": "^8.44.0",
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
 }
