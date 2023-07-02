@@ -1,0 +1,11 @@
+{
+  "name": "crud-api",
+  "version": "1.0.0",
+  "description": "Simple CRUD API using in-memory database underneath.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Viktor Solovyev",
+  "license": "ISC"
+}
