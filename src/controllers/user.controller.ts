@@ -33,7 +33,7 @@ export const changeUserById = async (request: IncomingMessage, response: ServerR
   if (userId && uuidValidate(userId)) {
     const user = db.users.find((element) => element.id === userId);
     if (user) {
-      const requestCheckResult = await isValidRequest(request);
+      const requestCheckResult = await isValidRequest(request, response);
       if (requestCheckResult.isValid && requestCheckResult.user) {
         const changedUser = db.changeUserByIdInDb(user, requestCheckResult.user);
         response.writeHead(201);
@@ -72,7 +72,7 @@ export const removeUserById = async (request: IncomingMessage, response: ServerR
 
 export const addUser = async (request: IncomingMessage, response: ServerResponse) => {
   response.setHeader('Content-Type', 'application/json');
-  const requestCheckResult = await isValidRequest(request);
+  const requestCheckResult = await isValidRequest(request, response);
 
   if (requestCheckResult.isValid && requestCheckResult.user) {
     db.addUserToDb(requestCheckResult.user);
@@ -86,9 +86,10 @@ export const addUser = async (request: IncomingMessage, response: ServerResponse
 
 const isValidRequest = async (
   request: IncomingMessage,
+  response: ServerResponse,
 ): Promise<{ isValid: boolean; user?: User; errorMessage?: string[] }> => {
   const errors: string[] = [];
-  const body = await getJSONDataFromRequestStream<User>(request);
+  const body = await getJSONDataFromRequestStream<User>(request, response);
   if (body.username === undefined || typeof body.username !== 'string') {
     errors.push('Field username is required and its should be string type');
   }
@@ -115,14 +116,21 @@ const isValidRequest = async (
   };
 };
 
-function getJSONDataFromRequestStream<T>(request: IncomingMessage): Promise<T> {
+function getJSONDataFromRequestStream<T>(request: IncomingMessage, response: ServerResponse): Promise<T> {
   return new Promise((resolve) => {
     const chunks: Uint8Array[] = [];
     request.on('data', (chunk) => {
       chunks.push(chunk);
     });
     request.on('end', () => {
-      resolve(JSON.parse(Buffer.concat(chunks).toString()));
+      try {
+        resolve(JSON.parse(Buffer.concat(chunks).toString()));
+      } catch (error) {
+        response.setHeader('Content-Type', 'application/json');
+        response.writeHead(400);
+        response.write(JSON.stringify('Bad request'));
+        response.end();
+      }
     });
   });
 }
