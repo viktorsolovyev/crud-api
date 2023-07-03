@@ -1,8 +1,9 @@
 import http from 'node:http';
+import 'dotenv/config';
 import { addUser, changeUserById, getAllUsers, getUserById, removeUserById } from './controllers/user.controller.js';
 
 const host = 'localhost';
-const port = 4000;
+const port = Number(process.env.PORT) || 4000;
 
 export const runServer = () => {
   const server = http.createServer().listen(port, host, () => {
