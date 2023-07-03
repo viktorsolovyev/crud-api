@@ -41,6 +41,7 @@ export const runServer = () => {
       response.setHeader('Content-Type', 'application/json');
       response.writeHead(500);
       response.write(JSON.stringify('Internal server error'));
+      response.end();
     }
 
     response.end();
