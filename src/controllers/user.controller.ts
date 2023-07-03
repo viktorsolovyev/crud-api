@@ -27,6 +27,31 @@ export const getUserById = async (request: IncomingMessage, response: ServerResp
   }
 };
 
+export const changeUserById = async (request: IncomingMessage, response: ServerResponse) => {
+  response.setHeader('Content-Type', 'application/json');
+  const userId = request.url?.replace('/api/users/', '');
+  if (userId && uuidValidate(userId)) {
+    const user = db.users.find((element) => element.id === userId);
+    if (user) {
+      const requestCheckResult = await isValidRequest(request);
+      if (requestCheckResult.isValid && requestCheckResult.user) {
+        const changedUser = db.changeUserByIdInDb(user, requestCheckResult.user);
+        response.writeHead(201);
+        response.write(JSON.stringify(changedUser));
+      } else {
+        response.writeHead(400);
+        response.write(JSON.stringify(requestCheckResult.errorMessage));
+      }
+    } else {
+      response.writeHead(404);
+      response.write(JSON.stringify(`User with id=${userId} doesn't exist`));
+    }
+  } else {
+    response.writeHead(400);
+    response.write(JSON.stringify(`User id: ${userId} is invalid (not uuid)`));
+  }
+};
+
 export const removeUserById = async (request: IncomingMessage, response: ServerResponse) => {
   response.setHeader('Content-Type', 'application/json');
   const userId = request.url?.replace('/api/users/', '');
@@ -47,9 +72,6 @@ export const removeUserById = async (request: IncomingMessage, response: ServerR
 
 export const addUser = async (request: IncomingMessage, response: ServerResponse) => {
   response.setHeader('Content-Type', 'application/json');
-  //   response.writeHead(201);
-  //   response.write(JSON.stringify(request.));
-  //   response.write(JSON.stringify(body));
   const requestCheckResult = await isValidRequest(request);
 
   if (requestCheckResult.isValid && requestCheckResult.user) {
