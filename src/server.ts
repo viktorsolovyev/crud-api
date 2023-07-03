@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { getAllUsers, getUsersById } from './controllers/user.controller.js';
+import { getAllUsers, getUserById, removeUserById } from './controllers/user.controller.js';
 
 const host = 'localhost';
 const port = 4000;
@@ -10,7 +10,16 @@ export const runServer = () => {
       if (request.url === '/api/users' && request.method === 'GET') {
         await getAllUsers(request, response);
       } else if (request.url?.includes('/api/users/') && request.url?.replace('/api/users/', '').length) {
-        if (request.method === 'GET') await getUsersById(request, response);
+        switch (request.method) {
+          case 'GET':
+            await getUserById(request, response);
+            break;
+          case 'DELETE':
+            await removeUserById(request, response);
+            break;
+          default:
+            break;
+        }
       } else {
         response.setHeader('Content-Type', 'application/json');
         response.writeHead(400);
